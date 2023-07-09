@@ -1,5 +1,4 @@
-## This program is based on the DeepDTA model(https://github.com/hkmztrk/DeepDTA)
-## The program requires pytorch and gpu support.
+
 
 import random
 import torch
@@ -21,7 +20,6 @@ matplotlib.use('Agg')
 from datahelper import *
 from arguments import argparser, logging
 import time
-import matplotlib.pyplot as plt
 from copy import deepcopy
 from emetrics import *
 from model import net
@@ -115,8 +113,7 @@ def weights_init(model):
 def train(train_loader, model, FLAGS, NUM_FILTERS, FILTER_LENGTH1, FILTER_LENGTH2, lamda):
     model.train()
     loss_func = nn.MSELoss()
-    optimizer = optim.Adam(model.parameters() , lr= 0.0001)
-    # 学习率设置
+    optimizer = optim.Adam(model.parameters() , lr= 0.00005)
 
     with tqdm(train_loader) as t:
         for drug_SMILES, target_protein, affinity in t:
@@ -126,7 +123,7 @@ def train(train_loader, model, FLAGS, NUM_FILTERS, FILTER_LENGTH1, FILTER_LENGTH
             optimizer.zero_grad()
 
             affinity = Variable(affinity).cuda()
-            ##model only out = pre_affin
+
             pre_affinity = model(
                 drug_SMILES, target_protein, FLAGS, NUM_FILTERS,
                 FILTER_LENGTH1, FILTER_LENGTH2)
@@ -147,8 +144,6 @@ def test(model, test_loader, FLAGS, NUM_FILTERS, FILTER_LENGTH1, FILTER_LENGTH2,
     loss_func = nn.MSELoss()
     affinities = []
     pre_affinities = []
-    loss_d = 0
-    loss_t = 0
     with torch.no_grad():
         for i, (drug_SMILES, target_protein, affinity) in enumerate(test_loader):
             pre_affinity = model(drug_SMILES, target_protein, FLAGS, NUM_FILTERS,
@@ -161,7 +156,6 @@ def test(model, test_loader, FLAGS, NUM_FILTERS, FILTER_LENGTH1, FILTER_LENGTH2,
         loss = loss_func(torch.Tensor(pre_affinities), torch.Tensor(affinities))
         cindex = get_cindex(affinities, pre_affinities)
         rm2 = get_rm2(affinities, pre_affinities)
-        # auc = roc_auc_score(np.int32(affinities >7), pre_affinities)
         try:
             roc_auc_score(np.int32(affinities > 7), pre_affinities)
         except ValueError:
@@ -344,35 +338,6 @@ def general_nfold_cv_test(XD, XT, Y, label_row_inds, label_col_inds, prfmeasure,
     return best_param_list, best_perf, all_predictions, all_losses, all_auc, all_aupr
 
 
-# def plotLoss(history1, history2, history3, history4, batchind, epochind, param3ind, foldind, FLAGS):
-#     figname = "b" + str(batchind) + "_e" + str(epochind) + "_" + str(param3ind) + "_" + str(foldind) + "_" + str(
-#         time.time())
-#     plt.figure()
-#     plt.ylim(0,2)
-#     plt.plot(range(FLAGS.num_epoch), history1,color='blue',label='train_loss')
-#     plt.plot(range(FLAGS.num_epoch), history2,color='green',label='val_loss')
-#     plt.title('model loss')
-#     plt.ylabel('loss')
-#     plt.xlabel('epoch')
-#     # plt.legend(['trainloss', 'valloss', 'cindex', 'valcindex'], loc='upper left')
-#     plt.legend()
-#     plt.savefig("./figures/" + figname + ".png", dpi=None, facecolor='w', edgecolor='w', orientation='portrait',
-#                 papertype=None, format=None, transparent=False, bbox_inches=None, pad_inches=0.1, frameon=None)
-#     plt.close()
-
-#     ## PLOT CINDEX
-#     plt.figure()
-#     plt.title('model concordance index')
-#     plt.ylabel('cindex')
-#     plt.xlabel('epoch')
-#     plt.plot(range(FLAGS.num_epoch), history3,color='blue',label='train_cindex')
-#     plt.plot(range(FLAGS.num_epoch), history4,color='green',label='val_cindex')
-
-#     plt.legend()
-#     plt.savefig("./figures/" + figname + "_acc.png", dpi=None, facecolor='w', edgecolor='w', orientation='portrait',
-#                 papertype=None, format=None, transparent=False, bbox_inches=None, pad_inches=0.1, frameon=None)
-#     plt.close()
-
 def prepare_interaction_pairs(XD, XT, Y, rows, cols):
     dataset = [[]]
     for pair_ind in range(len(rows)):
@@ -384,7 +349,6 @@ def prepare_interaction_pairs(XD, XT, Y, rows, cols):
         if pair_ind < len(rows) - 1:
             dataset.append([])
     return dataset
-# 该函数的功能是将药物和靶标之间的相互作用数据从输入矩阵转换为一个列表，其中每个元素表示一对药物和靶标的特征及其相互作用的标签。具体来说，该函数接受四个参数：XD表示药物的特征矩阵，XT表示靶标的特征矩阵，Y表示药物和靶标相互作用的标签，rows是一个表示行索引的列表，cols是一个表示列索引的列表。函数通过迭代给定的行列索引，从输入矩阵中提取药物、靶标和相应的标签，并将它们组成一个包含三个元素的列表。然后，该列表被添加到一个大列表中，最终函数返回该列表作为输出。
 
 def experiment(FLAGS, foldcount=6):  # 5-fold cross validation + test
 
