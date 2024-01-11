@@ -53,3 +53,8 @@ All datasets can be download from https://github.com/hkmztrk/DeepDTA/tree/master
 
 ## Using
 '<python run_experiment.py>' 
+
+## Connect
+hpc@neau.edu.cn
+zhouchangjian@neau.edu.cn
+
