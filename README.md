@@ -14,13 +14,18 @@ Figure 1. (a) The architecture of Variational Autoencoder (VAE). This model cons
 ## Authors
 Changjian Zhou, Zhongzheng Li, Jia Song, Wensheng Xiang
 ## Abstract
+Background and objective
 Recent studies have emphasized the significance of computational in silico drug-target binding affinity (DTA) prediction in the field of drug discovery and drug repurposing. However, existing DTA prediction approaches suffer from two major deficiencies that impede their progress. Firstly, while most methods primarily focus on the feature representations of drug-target binding affinity pairs, they fail to consider the long-distance relationships of proteins. Furthermore, many deep learning-based DTA predictors simply model the interaction of drug-target pairs through concatenation, which hampers the ability to enhance prediction performance.
+
 Methods
 To address these issues, this study proposes a novel framework named TransVAE-DTA, which combines the transformer and variational autoencoder (VAE). Inspired by the early success of VAEs, we aim to further investigate the feasibility of VAEs for drug structure encoding, while utilizing the transformer architecture for target feature representation. Additionally, an adaptive attention pooling (AAP) module is designed to fuse the drug and target encoded features. Notably, TransVAE-DTA is proven to maximize the lower bound of the joint likelihood of drug, target, and their DTAs.
+
 Results
 Experimental results demonstrate the superiority of TransVAE-DTA in drug-target binding affinity prediction assignments on two public Davis and KIBA datasets.
+
 Conclusions
 In this research, the developed TransVAE-DTA opens a new avenue for engineering drug-target interactions.
+
 ## Requirements
 Our work is based on GPU
 
